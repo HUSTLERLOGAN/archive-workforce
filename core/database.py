@@ -75,12 +75,20 @@ class WorkforceDB:
     """Database client for Workforce system"""
     
     def __init__(self):
+        # Get from env, with fallback for debugging
         self.url = os.environ.get('SUPABASE_URL', '').strip().strip('"').strip("'")
         self.key = os.environ.get('SUPABASE_KEY', '').strip().strip('"').strip("'")
+        
+        # Fallback to hardcoded values if env vars are empty/broken
+        if not self.url or 'supabase' not in self.url:
+            self.url = "https://zntcbqggombcbbtxchhq.supabase.co"
+            print(f"[DB] Using fallback SUPABASE_URL")
+        if not self.key or len(self.key) < 50:
+            self.key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpudGNicWdnb21iY2JidHhjaGhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2MzE5NjAsImV4cCI6MjA1NDIwNzk2MH0.qCCTM0Jb0S0DIKhhkXPADmYOqFcCQGVMUM8kMlZwSKY"
+            print(f"[DB] Using fallback SUPABASE_KEY")
+            
         self._client: Optional[Client] = None
-        # Debug logging
-        print(f"[DB] SUPABASE_URL: {self.url[:50] if self.url else 'NOT SET'}...")
-        print(f"[DB] SUPABASE_KEY: {self.key[:20] if self.key else 'NOT SET'}...")
+        print(f"[DB] Final URL: {self.url}")
     
     @property
     def client(self) -> Client:
