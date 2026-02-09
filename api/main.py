@@ -12,12 +12,12 @@ from datetime import datetime
 import os
 import sys
 
-# Add workforce to path
-sys.path.insert(0, '/root/clawd/workforce')
-sys.path.insert(0, '/root/clawd/discord-bot')
-
-from dotenv import load_dotenv
-load_dotenv('/root/clawd/discord-bot/.env')
+# Add workforce to path for local development
+if os.path.exists('/root/clawd/workforce'):
+    sys.path.insert(0, '/root/clawd/workforce')
+    sys.path.insert(0, '/root/clawd/discord-bot')
+    from dotenv import load_dotenv
+    load_dotenv('/root/clawd/discord-bot/.env')
 
 from core.database import get_db, TaskStatus, Priority
 
