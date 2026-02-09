@@ -389,6 +389,40 @@ class WorkforceDB:
         result = self.client.table("workforce_agents").update(updates).eq("id", agent_id).execute()
         return result.data[0] if result.data else None
     
+    def create_agent(
+        self,
+        name: str,
+        role: str,
+        capabilities: List[str] = None,
+        model_config: Dict = None,
+        enabled: bool = True
+    ) -> Dict:
+        """Create a new agent"""
+        agent_id = name.lower().replace(" ", "_")
+        now = datetime.now(timezone.utc).isoformat()
+        
+        # Extract model provider and id from config
+        model_provider = "openai"
+        model_id = "gpt-4o-mini"
+        if model_config:
+            model_provider = model_config.get("provider", "openai")
+            model_id = model_config.get("model", "gpt-4o-mini")
+        
+        data = {
+            "id": agent_id,
+            "name": name,
+            "role": role,
+            "capabilities": capabilities or [],
+            "model_provider": model_provider,
+            "model_id": model_id,
+            "enabled": enabled,
+            "created_at": now,
+            "updated_at": now
+        }
+        
+        result = self.client.table("workforce_agents").insert(data).execute()
+        return result.data[0] if result.data else data
+    
     def log_agent_run(
         self,
         agent_id: str,

@@ -83,6 +83,13 @@ class IntakeMessage(BaseModel):
     channel_id: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = {}
 
+class AgentCreate(BaseModel):
+    name: str
+    role: str
+    capabilities: List[str] = []
+    model_config_data: Optional[Dict[str, Any]] = None  # Renamed to avoid Pydantic conflict
+    enabled: bool = True
+
 class ApprovalAction(BaseModel):
     action: str = Field(..., pattern="^(approve|reject)$")
     reason: Optional[str] = None
@@ -268,6 +275,18 @@ async def get_agent(agent_id: str):
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
     return agent
+
+@app.post("/agents", tags=["Agents"])
+async def create_agent(agent: AgentCreate, actor: str = Depends(get_actor)):
+    """Create a new agent"""
+    db = get_db()
+    return db.create_agent(
+        name=agent.name,
+        role=agent.role,
+        capabilities=agent.capabilities,
+        model_config=agent.model_config_data,
+        enabled=agent.enabled
+    )
 
 @app.patch("/agents/{agent_id}", tags=["Agents"])
 async def update_agent(agent_id: str, updates: Dict[str, Any], actor: str = Depends(get_actor)):
