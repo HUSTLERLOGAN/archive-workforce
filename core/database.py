@@ -75,9 +75,12 @@ class WorkforceDB:
     """Database client for Workforce system"""
     
     def __init__(self):
-        self.url = os.environ.get('SUPABASE_URL')
-        self.key = os.environ.get('SUPABASE_KEY')
+        self.url = os.environ.get('SUPABASE_URL', '').strip().strip('"').strip("'")
+        self.key = os.environ.get('SUPABASE_KEY', '').strip().strip('"').strip("'")
         self._client: Optional[Client] = None
+        # Debug logging
+        print(f"[DB] SUPABASE_URL: {self.url[:50] if self.url else 'NOT SET'}...")
+        print(f"[DB] SUPABASE_KEY: {self.key[:20] if self.key else 'NOT SET'}...")
     
     @property
     def client(self) -> Client:
